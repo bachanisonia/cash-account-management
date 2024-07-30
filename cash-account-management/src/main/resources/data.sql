@@ -1,0 +1,3 @@
+insert into account(account_id, account_balance, account_currency, account_credit_limit) values('ACCOUNT5285', 500.0, 'GBP', 1000.0);
+insert into account(account_id, account_balance, account_currency, account_credit_limit) values('ACCOUNT6559', 500.0, 'GBP', 1000.0);
+insert into account(account_id, account_balance, account_currency, account_credit_limit) values('ACCOUNT1053', 500.0, 'GBP', 1000.0);
