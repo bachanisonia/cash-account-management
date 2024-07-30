@@ -3,16 +3,16 @@ package com.jpminterview.dto;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class AccountTransactionInput {
+public class TransactionInput {
 	
 	String accountId;
 	BigDecimal transactionAmount;
 	String transactionCurrency;
 	
-	public AccountTransactionInput() {
+	public TransactionInput() {
 	}
 	
-	public AccountTransactionInput(String accountId, BigDecimal transactionAmount,
+	public TransactionInput(String accountId, BigDecimal transactionAmount,
 			String transactionCurrency) {
 		this.accountId = accountId;
 		this.transactionAmount = transactionAmount;
@@ -57,7 +57,7 @@ public class AccountTransactionInput {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AccountTransactionInput other = (AccountTransactionInput) obj;
+		TransactionInput other = (TransactionInput) obj;
 		return Objects.equals(accountId, other.accountId) && Objects.equals(transactionAmount, other.transactionAmount)
 				&& Objects.equals(transactionCurrency, other.transactionCurrency);
 	}

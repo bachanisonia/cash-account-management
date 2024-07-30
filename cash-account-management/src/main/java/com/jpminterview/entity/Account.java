@@ -21,7 +21,7 @@ public class Account {
 		//this.accountCreditLimit = new BigDecimal(1000);
 		this.accountCurrency = "GBP";
 	}
-/*
+
 	public Account(String accountId, String accountCurrency, BigDecimal accountBalance, BigDecimal accountThreshold,
 			BigDecimal accountCreditLimit) {
 		
@@ -34,7 +34,7 @@ public class Account {
 		this.accountBalance = accountBalance;
 
 	}
-*/
+
 	public void setAccountId(String accountId) {
 		this.accountId = accountId;
 	}

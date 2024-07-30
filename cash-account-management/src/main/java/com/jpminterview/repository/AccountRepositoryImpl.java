@@ -4,11 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.jpminterview.dto.AccountInput;
 import com.jpminterview.entity.Account;
 
 @Repository
@@ -19,10 +21,10 @@ public class AccountRepositoryImpl implements AccountRepository {
 
 
 	@Override
-	public Account getAccount(String accountId) {
+	public Account getAccount(AccountInput accountInput) {
 		
 		Account account = new Account();
-		account.setAccountId(accountId);
+		account.setAccountId(accountInput.getAccountId());
 		Account resultAccount;
 		
 		try {
@@ -33,6 +35,9 @@ public class AccountRepositoryImpl implements AccountRepository {
 		catch(EmptyResultDataAccessException e1) {
 			return null;
 		}
+		catch(DataAccessException e2) {
+			return null;
+		}
 		
 		return resultAccount;
 	}
@@ -41,15 +46,23 @@ public class AccountRepositoryImpl implements AccountRepository {
 	@Override
 	public int updateAccount(Account account) {
 		
-		String sql = "update account set account_balance = :accountBalance, account_credit_limit = :accountCreditLimit " +
-		             " where account_id = :accountId";
+		int result;
 		
-		Map<String, Object> parameters = new HashMap<>();
-		parameters.put("accountBalance", account.getAccountBalance());
-		parameters.put("accountCreditLimit", account.getAccountCreditLimit());
-		parameters.put("accountId", account.getAccountId());
-		
-		return jdbcTemplate.update(sql, parameters);
+		try {
+			String sql = "update account set account_balance = :accountBalance, account_credit_limit = :accountCreditLimit " +
+			             " where account_id = :accountId";
+			
+			Map<String, Object> parameters = new HashMap<>();
+			parameters.put("accountBalance", account.getAccountBalance());
+			parameters.put("accountCreditLimit", account.getAccountCreditLimit());
+			parameters.put("accountId", account.getAccountId());
+			
+			result = jdbcTemplate.update(sql, parameters);
+		}
+		catch(DataAccessException  e1) {
+			return 0;
+		}
+		return result;
 	}
 	
 	

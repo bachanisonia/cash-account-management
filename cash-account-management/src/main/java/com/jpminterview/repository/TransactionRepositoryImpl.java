@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -14,7 +16,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import com.jpminterview.dto.AccountTransactionInput;
+import com.jpminterview.dto.TransactionInput;
 import com.jpminterview.entity.Transaction;
 import com.jpminterview.entity.TransactionType;
 
@@ -32,17 +34,22 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 		MapSqlParameterSource parameters = new MapSqlParameterSource();
 		int result;
 		
-		String sql = " insert into transaction (transaction_type, transaction_amount, transaction_currency, account_id)" +
-					 " values( :transactionType, :transactionAmount, :transactionCurrency, :accountId)";
+		try {
+			String sql = " insert into transaction (transaction_type, transaction_amount, transaction_currency, account_id)" +
+						 " values( :transactionType, :transactionAmount, :transactionCurrency, :accountId)";
+			
 		
-	
-		parameters.addValue("transactionType", transaction.getTransactionType());
-		parameters.addValue("transactionAmount", transaction.getTransactionAmount());
-		parameters.addValue("transactionCurrency", transaction.getTransactionCurrency());
-		parameters.addValue("accountId", transaction.getAccountId());
-		
-		result = jdbcTemplate.update(sql, parameters, keyHolder);
-		transaction.setTransactionRef((Long) keyHolder.getKey());
+			parameters.addValue("transactionType", transaction.getTransactionType());
+			parameters.addValue("transactionAmount", transaction.getTransactionAmount());
+			parameters.addValue("transactionCurrency", transaction.getTransactionCurrency());
+			parameters.addValue("accountId", transaction.getAccountId());
+			
+			result = jdbcTemplate.update(sql, parameters, keyHolder);
+			transaction.setTransactionRef((Long) keyHolder.getKey());
+		}
+		catch(DataAccessException e1) {
+			return 0;
+		}
 		
 		return result;
 		
@@ -57,10 +64,18 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 	@Override
 	public List<Transaction> getAllTransactions() {
 		
-		String sql = "select * from transaction";
 		List<Transaction> transactions = new ArrayList<>();
 		
-		transactions = jdbcTemplate.query(sql, new TransactionRowMapper());
+		try {
+			String sql = "select * from transaction";	
+			transactions = jdbcTemplate.query(sql, new TransactionRowMapper());
+		}
+		catch(EmptyResultDataAccessException e1) {
+			return null;
+		}
+		catch(DataAccessException e2) {
+			return null;
+		}
 		
 		return transactions;
 	}
@@ -69,11 +84,21 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 	public List<Transaction> getTransactionsForAnAccount(String accountId) {
 		
 		MapSqlParameterSource parameters = new MapSqlParameterSource();
+		List<Transaction> transactions = new ArrayList<>();
 		
 		parameters.addValue("accountId", accountId);
 		
-		String sql = "select * from transaction where account_id = :accountId";
-		return jdbcTemplate.query(sql, parameters, new TransactionRowMapper());
+		try {
+			String sql = "select * from transaction where account_id = :accountId";
+			transactions = jdbcTemplate.query(sql, parameters, new TransactionRowMapper());
+		}
+		catch(EmptyResultDataAccessException e1) {
+			return null;
+		}
+		catch(DataAccessException e2) {
+			return null;
+		}
+		return transactions;
 	}
 
 }

@@ -11,30 +11,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jpminterview.dto.AccountTransactionInput;
+import com.jpminterview.dto.AccountInput;
+import com.jpminterview.dto.TransactionInput;
 import com.jpminterview.entity.Account;
 import com.jpminterview.entity.Transaction;
-import com.jpminterview.service.AccountService;
+import com.jpminterview.service.CashAccountService;
 import com.jpminterview.util.Message;
 
 @RestController
 @RequestMapping("/cash-management")
 public class AccountController {
 
-	private AccountService accountService;
+	private CashAccountService accountService;
 	
 	@Autowired
-	public AccountController(AccountService accountService) {
+	public AccountController(CashAccountService accountService) {
 		this.accountService = accountService;
 	}
 
 	@PostMapping("/accounts")
-	public ResponseEntity<?> getAccountInfo(@RequestParam String accountId) {
+	public ResponseEntity<?> getAccountInfo(@RequestBody AccountInput accountInput) {
 		
-		Account account = accountService.getAccount(accountId);
+		Account account = accountService.getAccount(accountInput);
 		
 		if (account == null) {
-			return new ResponseEntity<>(Message.NO_ACCOUNT_FOUND, HttpStatus.OK);
+			return new ResponseEntity<>(Message.NO_ACCOUNT_FOUND, HttpStatus.BAD_REQUEST);
 		}
 		else {
 			return new ResponseEntity<>(account, HttpStatus.OK);
@@ -42,12 +43,12 @@ public class AccountController {
 	}
 	
 	@PostMapping("/debit")
-	public ResponseEntity<?> accountDebit(@RequestBody AccountTransactionInput accountTransactionInput) {
+	public ResponseEntity<?> accountDebit(@RequestBody TransactionInput accountTransactionInput) {
 		return accountService.debit(accountTransactionInput);
 	}
 	
 	@PostMapping("/credit")
-	public ResponseEntity<?> accountCredit(@RequestBody AccountTransactionInput accountTransactionInput) {
+	public ResponseEntity<?> accountCredit(@RequestBody TransactionInput accountTransactionInput) {
 		return accountService.credit(accountTransactionInput);
 	}
 	

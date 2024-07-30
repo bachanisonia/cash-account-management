@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jpminterview.entity.Transaction;
-import com.jpminterview.service.TransactionService;
+import com.jpminterview.service.CashTransactionService;
 import com.jpminterview.util.Message;
 
 @RestController
@@ -20,7 +20,7 @@ import com.jpminterview.util.Message;
 public class TransactionController {
 
 	@Autowired
-	private TransactionService transactionService;
+	private CashTransactionService transactionService;
 	
 
 	@GetMapping("/transactions")
