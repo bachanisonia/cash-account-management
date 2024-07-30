@@ -1,7 +1,9 @@
 package com.jpminterview.repository;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +52,28 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 	public Transaction getTransactionDetails(Long transactionRef) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public List<Transaction> getAllTransactions() {
+		
+		String sql = "select * from transaction";
+		List<Transaction> transactions = new ArrayList<>();
+		
+		transactions = jdbcTemplate.query(sql, new TransactionRowMapper());
+		
+		return transactions;
+	}
+
+	@Override
+	public List<Transaction> getTransactionsForAnAccount(String accountId) {
+		
+		MapSqlParameterSource parameters = new MapSqlParameterSource();
+		
+		parameters.addValue("accountId", accountId);
+		
+		String sql = "select * from transaction where account_id = :accountId";
+		return jdbcTemplate.query(sql, parameters, new TransactionRowMapper());
 	}
 
 }

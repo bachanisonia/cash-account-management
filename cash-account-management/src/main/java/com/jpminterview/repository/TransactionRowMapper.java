@@ -14,12 +14,13 @@ public class TransactionRowMapper implements RowMapper<Transaction> {
 		
 		Transaction transaction = new Transaction();
 		
+		transaction.setTransactionRef(rs.getLong("transaction_ref"));
 		transaction.setAccountId(rs.getString("account_id"));
 		transaction.setTransactionAmount(rs.getBigDecimal("transaction_amount"));
 		transaction.setTransactionCurrency(rs.getString("transaction_currency"));
 		transaction.setTransactionType(rs.getString("transaction_type"));
 		
-		return null;
+		return transaction;
 	}
 
 }

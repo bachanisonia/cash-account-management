@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jpminterview.dto.AccountTransactionInput;
@@ -20,11 +21,15 @@ import com.jpminterview.util.Message;
 @RequestMapping("/cash-management")
 public class AccountController {
 
-	@Autowired
 	private AccountService accountService;
 	
-	@GetMapping("/{accountId}")
-	public ResponseEntity<?> getAccountInfo(@PathVariable String accountId) {
+	@Autowired
+	public AccountController(AccountService accountService) {
+		this.accountService = accountService;
+	}
+
+	@PostMapping("/accounts")
+	public ResponseEntity<?> getAccountInfo(@RequestParam String accountId) {
 		
 		Account account = accountService.getAccount(accountId);
 		
@@ -37,9 +42,13 @@ public class AccountController {
 	}
 	
 	@PostMapping("/debit")
-	public ResponseEntity<?> accountCredit(@RequestBody AccountTransactionInput accountTransactionInput) {
-		
+	public ResponseEntity<?> accountDebit(@RequestBody AccountTransactionInput accountTransactionInput) {
 		return accountService.debit(accountTransactionInput);
+	}
+	
+	@PostMapping("/credit")
+	public ResponseEntity<?> accountCredit(@RequestBody AccountTransactionInput accountTransactionInput) {
+		return accountService.credit(accountTransactionInput);
 	}
 	
 	

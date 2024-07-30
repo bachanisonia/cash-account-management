@@ -105,7 +105,7 @@ public class AccountService implements AccountTransaction {
 		}
 		
 		
-		/* ******  Update the account with new balances ******* */
+		/* ******  Update the account with the new balances ******* */
 		updateAccountBalances(drAccount, transactionAmount);
 		accountRepository.updateAccount(drAccount);
 		
@@ -126,7 +126,32 @@ public class AccountService implements AccountTransaction {
 
 	@Override
 	public ResponseEntity<?> credit(AccountTransactionInput transactionInput) {
+		
+		BigDecimal transactionAmount = transactionInput.getTransactionAmount();
+		
+		
+		/* ******  Get Account details ******* */
+		Account crAccount = getAccount(transactionInput.getAccountId());
+		
+		if (crAccount == null) {
+			return new ResponseEntity<>(Message.NO_ACCOUNT_FOUND, HttpStatus.OK);
+		}
+		
+		
+		/* ******  Update the account with the new balance ******* */
+		crAccount.setAccountBalance(crAccount.getAccountBalance().add(transactionAmount));
+		accountRepository.updateAccount(crAccount);
+		
 		Transaction crTransaction = new Transaction();
+		crTransaction.setAccountId(transactionInput.getAccountId());
+		crTransaction.setTransactionAmount(transactionInput.getTransactionAmount());
+		crTransaction.setTransactionCurrency(transactionInput.getTransactionCurrency());
+		crTransaction.setTransactionType(TransactionType.CREDIT.getTransactionType());
+		
+		/* ******  Save the transaction details ******* */
+		transactionRepository.save(crTransaction);
+		
 		return new ResponseEntity<>(crTransaction, HttpStatus.OK);
+	
 	}
 }
