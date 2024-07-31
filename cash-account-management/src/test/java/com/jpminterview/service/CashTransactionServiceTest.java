@@ -68,4 +68,34 @@ class CashTransactionServiceTest {
 		
 	}
 	
+	@Test
+	@DisplayName("getAllTransactions - Transactions not found")
+	void testTransactionsNotFound() {
+		
+		List<Transaction> transactions = new ArrayList<>();
+		when(transactionRepository.getAllTransactions()).thenReturn(transactions);
+		
+		List<Transaction> resultTransactions = mockTransactionService.getAllTransactions();
+		
+		assertEquals(transactions.size(), resultTransactions.size());
+		assertEquals(transactions, resultTransactions);
+		
+	}
+	
+	@Test
+	@DisplayName("getTransactionsForAnAccount - Transactions not found")
+	void testTransactionsNotFoundForAnAccount() {
+		
+		String accountId = "ACCOUNT52850";
+		
+		List<Transaction> transactions = new ArrayList<>();
+		when(transactionRepository.getTransactionsForAnAccount(accountId)).thenReturn(transactions);
+		
+		List<Transaction> resultTransactions = mockTransactionService.getTransactionsForAnAccount(accountId);
+		
+		assertEquals(transactions.size(), resultTransactions.size());
+		assertEquals(transactions, resultTransactions);
+		
+	}
+	
 }

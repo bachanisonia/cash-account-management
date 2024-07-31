@@ -18,7 +18,7 @@ public class CashTransactionService implements TransactionService {
 
 	private AccountRepositoryImpl accountRepository;
 	private TransactionRepositoryImpl transactionRepository;
-	private static final Logger log = LoggerFactory.getLogger(CashAccountService.class);
+	private static final Logger logger = LoggerFactory.getLogger(CashAccountService.class);
 	
 	@Autowired
 	public CashTransactionService(AccountRepositoryImpl accountRepository, TransactionRepositoryImpl transactionRepository) {
@@ -27,12 +27,29 @@ public class CashTransactionService implements TransactionService {
 	}
 
 	public List<Transaction> getAllTransactions() {
+		
 		List<Transaction> transactions = transactionRepository.getAllTransactions();
-		return transactions.stream().sorted( (x1,x2) -> x1.getTransactionRef().compareTo(x2.getTransactionRef())).collect(Collectors.toList());	
+		
+		if (transactions.size() != 0) {
+			return transactions.stream().sorted( (x1,x2) -> x1.getTransactionRef().compareTo(x2.getTransactionRef())).collect(Collectors.toList());	
+		}
+		else {
+			logger.debug("Could not find any transactions...");
+			return transactions;
+		}
 	}
 	
 	public List<Transaction> getTransactionsForAnAccount(String accountId) {
-		return transactionRepository.getTransactionsForAnAccount(accountId);
+		
+		List<Transaction> transactions = transactionRepository.getTransactionsForAnAccount(accountId);
+		
+		if (transactions.size() != 0) {
+			return transactions.stream().sorted( (x1,x2) -> x1.getTransactionRef().compareTo(x2.getTransactionRef())).collect(Collectors.toList());	
+		}
+		else {
+			logger.debug("Could not find any transactions for the account [{}]", accountId);
+			return transactions;
+		}
 	}
 	
 }

@@ -51,7 +51,7 @@ class AccountControllerTest {
 		@DisplayName("Invalid Account Number")
 		void testInvalidAccountNumber() throws Exception {
 			String accountId = "ACCOUNT5670";
-			when(accountService.getAccount(accountId)).thenReturn(new AccountResponse(Message.NO_ACCOUNT_FOUND));
+			when(accountService.getAccountDetails(accountId)).thenReturn(new AccountResponse(Message.ACCOUNT_NOT_FOUND));
 			
 			mvc.perform(MockMvcRequestBuilders.post("/cash-management/accounts")
 					.content(JsonUtil.toJson(accountId))
@@ -65,7 +65,7 @@ class AccountControllerTest {
 			
 			String accountId = "ACCOUNT5285";
 			Account account = new Account("ACCOUNT5285", "GBP", new BigDecimal(500.0), new BigDecimal(500.0), new BigDecimal(500.0));
-			when(accountService.getAccount(accountId)).thenReturn(new AccountResponse(account, Message.OK));
+			when(accountService.getAccountDetails(accountId)).thenReturn(new AccountResponse(account, Message.OK));
 			
 			mvc.perform(MockMvcRequestBuilders.post("/cash-management/accounts")
 					.content(JsonUtil.toJson(accountId))
@@ -85,15 +85,84 @@ class AccountControllerTest {
 		void testInvalidAccountNumber() throws Exception {
 			
 			TransactionInput transactionInput = new TransactionInput("ACCOUNT52850", new BigDecimal(100.0), "GBP");
-			//when(accountService.getAccount("ACCOUNT52850")).thenReturn(new AccountResponse(Message.NO_ACCOUNT_FOUND));
-			when(accountService.debit(transactionInput)).thenReturn(new TransactionResponse(Message.NO_ACCOUNT_FOUND));
+			when(accountService.debit(transactionInput)).thenReturn(new TransactionResponse(Message.ACCOUNT_NOT_FOUND));
 			
 			mvc.perform(MockMvcRequestBuilders.post("/cash-management/debit")
-					//.content("{\"accountId\": \"ACCOUNT52850\", \"transactionAmount\": 100.0, \"transactionCurrency\": \"GBP\"}")
 					.content(JsonUtil.toJson(transactionInput))
 					.contentType(MediaType.APPLICATION_JSON))
 					.andExpect(MockMvcResultMatchers.status().isBadRequest());
 		}
+		
+		@Test
+		@DisplayName("Insufficient Funds")
+		void testInsufficientFunds() throws Exception {
+			
+			String accountId = "ACCOUNT5285";
+			TransactionInput transactionInput = new TransactionInput(accountId, new BigDecimal(1000.0), "GBP");
+			TransactionResponse transactionResponse = new TransactionResponse(Message.INSUFFICIENT_FUNDS);
+
+			when(accountService.debit(transactionInput)).thenReturn(transactionResponse);
+			
+			mvc.perform(MockMvcRequestBuilders.post("/cash-management/debit")
+					.content(JsonUtil.toJson(transactionInput))
+					.contentType(MediaType.APPLICATION_JSON))
+					.andExpect(MockMvcResultMatchers.status().isBadRequest())
+					.andExpect(MockMvcResultMatchers.content().string(Message.INSUFFICIENT_FUNDS.getMessageDesc()));
+			
+			
+			
+		}
+		
+		@Test
+		@DisplayName("Successful Debit")
+		void testSuccessfulDebit() throws Exception {
+			
+			String accountId = "ACCOUNT5285";
+			TransactionInput transactionInput = new TransactionInput(accountId, new BigDecimal(1000.0), "GBP");
+			TransactionResponse transactionResponse = new TransactionResponse(Message.OK);
+
+			when(accountService.debit(transactionInput)).thenReturn(transactionResponse);
+			
+			mvc.perform(MockMvcRequestBuilders.post("/cash-management/debit")
+					.content(JsonUtil.toJson(transactionInput))
+					.contentType(MediaType.APPLICATION_JSON))
+					.andExpect(MockMvcResultMatchers.status().isOk());
+		}
 	}
 
+	
+	@Nested
+	@DisplayName("accountCredit")
+	class CreditTest {
+		
+		@Test
+		@DisplayName("Invalid Account Number")
+		void testInvalidAccountNumber() throws Exception {
+			
+			TransactionInput transactionInput = new TransactionInput("ACCOUNT52850", new BigDecimal(100.0), "GBP");
+			when(accountService.credit(transactionInput)).thenReturn(new TransactionResponse(Message.ACCOUNT_NOT_FOUND));
+			
+			mvc.perform(MockMvcRequestBuilders.post("/cash-management/credit")
+					.content(JsonUtil.toJson(transactionInput))
+					.contentType(MediaType.APPLICATION_JSON))
+					.andExpect(MockMvcResultMatchers.status().isBadRequest());
+		}
+		
+		@Test
+		@DisplayName("Successful Credit")
+		void testSuccessfulCredit() throws Exception {
+			
+			String accountId = "ACCOUNT5285";
+			TransactionInput transactionInput = new TransactionInput(accountId, new BigDecimal(1000.0), "GBP");
+			TransactionResponse transactionResponse = new TransactionResponse(Message.OK);
+
+			when(accountService.credit(transactionInput)).thenReturn(transactionResponse);
+			
+			mvc.perform(MockMvcRequestBuilders.post("/cash-management/credit")
+					.content(JsonUtil.toJson(transactionInput))
+					.contentType(MediaType.APPLICATION_JSON))
+					.andExpect(MockMvcResultMatchers.status().isOk());
+			
+		}
+	}
 }

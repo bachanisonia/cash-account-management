@@ -26,7 +26,7 @@ public class CashAccountService implements AccountService {
 
 	private AccountRepositoryImpl accountRepository;
 	private TransactionRepositoryImpl transactionRepository;
-	private static final Logger log = LoggerFactory.getLogger(CashAccountService.class);
+	private static final Logger logger = LoggerFactory.getLogger(CashAccountService.class);
 	
 	@Autowired
 	public CashAccountService(AccountRepositoryImpl accountRepository, TransactionRepositoryImpl transactionRepository) {
@@ -34,13 +34,13 @@ public class CashAccountService implements AccountService {
 		this.transactionRepository = transactionRepository;
 	}
 
-	public AccountResponse getAccount(String accountId) {
+	public AccountResponse getAccountDetails(String accountId) {
 		
 		Account account = accountRepository.getAccount(accountId);
 		AccountResponse accountResponse = new AccountResponse();
 		
 		if (account == null) {
-			accountResponse.setMessage(Message.NO_ACCOUNT_FOUND);
+			accountResponse.setMessage(Message.ACCOUNT_NOT_FOUND);
 		}
 		
 		accountResponse.setMessage(Message.OK);
@@ -59,12 +59,14 @@ public class CashAccountService implements AccountService {
 		BigDecimal creditLimit = account.getAccountCreditLimit();
 		BigDecimal threshold = account.getAccountThreshold();
 		
+		logger.info("Current Balance : [{}] , Credit Limit : [{}], Threshold : [{}], Transaction Amount [{}]", currentBalance, creditLimit, threshold, transactionAmount);
+		logger.info("Checking if the account has sufficient funds...");
 		BigDecimal newBalance = currentBalance.subtract(transactionAmount);
 		
-		if ( (newBalance.add(creditLimit)).compareTo(threshold) >= 0) {
+		if ( (newBalance.add(creditLimit)).compareTo(threshold) >= 0 ) {
+			logger.debug("Account has funds...");
 			return true;
 		}
-		
 		return false;
 		
 	}
@@ -79,9 +81,11 @@ public class CashAccountService implements AccountService {
 		BigDecimal newBalance = currentBalance.subtract(transactionAmount);
 		
 		if ( newBalance.compareTo(threshold) >= 0 ) {
+			logger.debug("The account does not need any credit...");
 			account.setAccountBalance(newBalance);
 		}
 		else {
+			logger.debug("The account may need some credit...");
 			BigDecimal creditRequired = threshold.subtract(newBalance);
 			
 			account.setAccountBalance(newBalance.add(creditRequired));
@@ -105,14 +109,15 @@ public class CashAccountService implements AccountService {
 		
 		
 		/* ******  Get Account details ******* */
-		AccountResponse accountResponse = getAccount(transactionInput.getAccountId());
+		AccountResponse accountResponse = getAccountDetails(transactionInput.getAccountId());
 		Account drAccount = accountResponse.getAccount();
 		
 		if (drAccount == null) {
-			transactionResponse.setMessage(Message.NO_ACCOUNT_FOUND);
+			transactionResponse.setMessage(Message.ACCOUNT_NOT_FOUND);
 			return transactionResponse;
 		}
 		
+		logger.info("Account[{}] found...", transactionInput.getAccountId());
 		
 		/* ******  Check Account Funds ******* */
 		if ( !hasSufficientFunds(drAccount, transactionAmount) ) {
@@ -120,10 +125,13 @@ public class CashAccountService implements AccountService {
 			return transactionResponse;
 		}
 		
+		logger.info("Account [{}] has sufficient funds for the debit...", transactionInput.getAccountId());
 		
 		/* ******  Update the account with the new balances ******* */
 		updateAccountBalances(drAccount, transactionAmount);
 		accountRepository.updateAccount(drAccount);
+		
+		logger.info("Account [{}] updated with the new balance...", transactionInput.getAccountId());
 		
 		Transaction drTransaction = new Transaction();
 		drTransaction.setAccountId(transactionInput.getAccountId());
@@ -134,6 +142,8 @@ public class CashAccountService implements AccountService {
 		
 		/* ******  Save the transaction details ******* */
 		transactionRepository.save(drTransaction);
+		
+		logger.info("New Debit transaction details saved for the account [{}]", transactionInput.getAccountId());
 		
 		transactionResponse.setMessage(Message.OK);
 		transactionResponse.setTransaction(drTransaction);
@@ -151,17 +161,21 @@ public class CashAccountService implements AccountService {
 		TransactionResponse transactionResponse = new TransactionResponse();
 		
 		/* ******  Get Account details ******* */
-		AccountResponse accountResponse = getAccount(transactionInput.getAccountId());
+		AccountResponse accountResponse = getAccountDetails(transactionInput.getAccountId());
 		Account crAccount = accountResponse.getAccount();
 		
 		if (crAccount == null) {
-			transactionResponse.setMessage(Message.NO_ACCOUNT_FOUND);
+			transactionResponse.setMessage(Message.ACCOUNT_NOT_FOUND);
 			return transactionResponse;
 		}
+		
+		logger.info("Account[{}] found...", transactionInput.getAccountId());
 		
 		/* ******  Update the account with the new balance ******* */
 		crAccount.setAccountBalance(crAccount.getAccountBalance().add(transactionAmount));
 		accountRepository.updateAccount(crAccount);
+		
+		logger.info("Account [{}] updated with the new balance...", transactionInput.getAccountId());
 		
 		Transaction crTransaction = new Transaction();
 		crTransaction.setAccountId(transactionInput.getAccountId());
@@ -174,6 +188,8 @@ public class CashAccountService implements AccountService {
 		
 		transactionResponse.setMessage(Message.OK);
 		transactionResponse.setTransaction(crTransaction);
+		
+		logger.info("New Credit transaction details saved for the account [{}]", transactionInput.getAccountId());
 		
 		return transactionResponse;
 	

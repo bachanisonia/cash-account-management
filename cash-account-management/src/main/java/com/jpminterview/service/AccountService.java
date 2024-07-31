@@ -11,7 +11,7 @@ import com.jpminterview.entity.Transaction;
 
 public interface AccountService {
 
-	public AccountResponse getAccount(String accountId);
+	public AccountResponse getAccountDetails(String accountId);
 	public TransactionResponse credit(TransactionInput transactionInput);
 	public TransactionResponse debit(TransactionInput transactionInput);
 }

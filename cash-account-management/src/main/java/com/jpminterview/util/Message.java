@@ -3,7 +3,7 @@ package com.jpminterview.util;
 public enum Message {
 	
 	OK("OK"),
-	NO_ACCOUNT_FOUND("Could not find the account no, Please check again."),
+	ACCOUNT_NOT_FOUND("Could not find the account no, Please check again."),
 	TRANSACTION_UNSUCCESSFUL("Transaction unsuccessfull !!!"),
 	INSUFFICIENT_FUNDS("Insufficient Funds !!!"),
 	NO_TRANSACTIONS_FOUND("No Transactions found !!!");

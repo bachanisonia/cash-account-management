@@ -1,5 +1,7 @@
 package com.jpminterview.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,8 @@ import com.jpminterview.util.Message;
 @RestController
 @RequestMapping("/cash-management")
 public class AccountController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(AccountController.class); 
 
 	private CashAccountService accountService;
 	
@@ -34,12 +38,17 @@ public class AccountController {
 	@PostMapping("/accounts")
 	public ResponseEntity<?> getAccountInfo(@RequestBody AccountInput accountInput) {
 		
-		AccountResponse accountResponse = accountService.getAccount(accountInput.getAccountId());
+		String accountId = accountInput.getAccountId();
+		logger.info("Received a request to get account details for : ["+ accountId + "]");
+		
+		AccountResponse accountResponse = accountService.getAccountDetails(accountId);
 		
 		if (!accountResponse.getMessage().equals(Message.OK)) {
+			logger.info("Account [" + accountId + "] not found");
 			return new ResponseEntity<>(accountResponse.getMessage().getMessageDesc(), HttpStatus.BAD_REQUEST);
 		}
 		else {
+			logger.info("Account [" + accountId + "] found. Printing details to the user...");
 			return new ResponseEntity<>(accountResponse.getAccount(), HttpStatus.OK);
 		}
 	}
@@ -47,12 +56,19 @@ public class AccountController {
 	@PostMapping("/debit")
 	public ResponseEntity<?> accountDebit(@RequestBody TransactionInput transactionInput) {
 		
+		logger.info("Received a debit request for account [{}], amount [{}], currency [{}]"
+				,transactionInput.getAccountId()
+				,transactionInput.getTransactionAmount()
+				,transactionInput.getTransactionCurrency());
+		
 		TransactionResponse transactionResponse = accountService.debit(transactionInput);
 		
 		if (!transactionResponse.getMessage().equals(Message.OK)) {
+			logger.info("Unsuccessful Debit Transaction - [{}]", transactionResponse.getMessage().getMessageDesc());
 			return new ResponseEntity<>(transactionResponse.getMessage().getMessageDesc(), HttpStatus.BAD_REQUEST);
 		}
 		else {
+			logger.info("Debit successful. Printing details to the user...");
 			return new ResponseEntity<>(transactionResponse.getTransaction(), HttpStatus.OK);
 		}
 	}
@@ -60,12 +76,19 @@ public class AccountController {
 	@PostMapping("/credit")
 	public ResponseEntity<?> accountCredit(@RequestBody TransactionInput transactionInput) {
 		
+		logger.info("Received a credit request for account [{}], amount [{}], currency [{}]"
+				,transactionInput.getAccountId()
+				,transactionInput.getTransactionAmount()
+				,transactionInput.getTransactionCurrency());
+		
 		TransactionResponse transactionResponse = accountService.credit(transactionInput);
 		
 		if (!transactionResponse.getMessage().equals(Message.OK)) {
+			logger.info("Unsuccessful Credit Transaction - [{}]", transactionResponse.getMessage().getMessageDesc());
 			return new ResponseEntity<>(transactionResponse.getMessage().getMessageDesc(), HttpStatus.BAD_REQUEST);
 		}
 		else {
+			logger.info("Credit successful. Printing details to the user...");
 			return new ResponseEntity<>(transactionResponse.getTransaction(), HttpStatus.OK);
 		}
 	}

@@ -30,6 +30,7 @@ public class Account {
 		this.accountThreshold = new BigDecimal(500);
 		this.accountId = accountId;
 		this.accountBalance = accountBalance;
+		this.accountCreditLimit = accountCreditLimit;
 
 	}
 
