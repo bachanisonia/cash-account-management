@@ -37,11 +37,11 @@ public class TransactionController {
 		List<Transaction> transactions = transactionService.getAllTransactions();
 		
 		if (transactions.size() != 0) {
-			logger.info("No transactions found...");
+			logger.info("Transactions found. Printing details to the user...");
 			return new ResponseEntity<>(transactions, HttpStatus.OK);
 		}
 		else {
-			logger.info("Transactions found. Printing details to the user...");
+			logger.info("No transactions found...");
 			return new ResponseEntity<>(Message.NO_TRANSACTIONS_FOUND, HttpStatus.OK);
 		}
 	}
@@ -55,11 +55,11 @@ public class TransactionController {
 		List<Transaction> transactions = transactionService.getTransactionsForAnAccount(accountInput.getAccountId());
 		
 		if (transactions.size() != 0) {
-			logger.info("No transactions found for the account [{}]", accountInput.getAccountId());
+			logger.info("Transactions found for the account [{}]. Printing details to the user...", accountInput.getAccountId());	
 			return new ResponseEntity<>(transactions, HttpStatus.OK);
 		}
 		else {
-			logger.info("Transactions found for the account [{}]. Printing details to the user...", accountInput.getAccountId());
+			logger.info("No transactions found for the account [{}]", accountInput.getAccountId());
 			return new ResponseEntity<>(Message.NO_TRANSACTIONS_FOUND, HttpStatus.OK);
 		}
 	}

@@ -3,6 +3,8 @@ package com.jpminterview.repository;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -12,16 +14,30 @@ import org.springframework.stereotype.Repository;
 
 import com.jpminterview.dto.AccountInput;
 import com.jpminterview.entity.Account;
+import com.jpminterview.util.AccountCacheImpl;
 
 @Repository
 public class AccountRepositoryImpl implements AccountRepository {
 
-	@Autowired
 	private NamedParameterJdbcTemplate jdbcTemplate;
+	private AccountCacheImpl accountCache;
+	private static final Logger logger = LoggerFactory.getLogger(AccountRepositoryImpl.class);
+
+	@Autowired
+	public AccountRepositoryImpl(NamedParameterJdbcTemplate jdbcTemplate, AccountCacheImpl accountCache) {
+		this.jdbcTemplate = jdbcTemplate;
+		this.accountCache = accountCache;
+	}
 
 
 	@Override
 	public Account getAccount(String accountId) {
+		
+		// Check if the given account exists in the Cache
+		if (accountCache.accountExists(accountId)) {
+			logger.debug("Found the account [{}] in the cache", accountId);
+			return accountCache.getAccountDetails(accountId);
+		}
 		
 		Account account = new Account();
 		account.setAccountId(accountId);
@@ -38,6 +54,10 @@ public class AccountRepositoryImpl implements AccountRepository {
 		catch(DataAccessException e2) {
 			return null;
 		}
+		
+		// Adding the account details to the cache for subsequent requests
+		logger.debug("Saving the account [{}] to the cache", accountId);
+		accountCache.saveAccount(resultAccount);
 		
 		return resultAccount;
 	}
@@ -62,6 +82,11 @@ public class AccountRepositoryImpl implements AccountRepository {
 		catch(DataAccessException  e1) {
 			return 0;
 		}
+		
+		// Updating the Cache with the new account details
+		accountCache.saveAccount(account);
+		logger.debug("Saving the account [{}] to the cache", account.getAccountId());
+		
 		return result;
 	}
 	

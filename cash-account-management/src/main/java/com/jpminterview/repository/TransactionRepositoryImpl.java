@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -19,14 +21,21 @@ import org.springframework.stereotype.Repository;
 import com.jpminterview.dto.TransactionInput;
 import com.jpminterview.entity.Transaction;
 import com.jpminterview.entity.TransactionType;
+import com.jpminterview.util.AccountCacheImpl;
 
 @Repository
 public class TransactionRepositoryImpl implements TransactionRepository {
 	
-	@Autowired
 	private NamedParameterJdbcTemplate jdbcTemplate;
+	private AccountCacheImpl accountCache;
+	private static final Logger logger = LoggerFactory.getLogger(TransactionRepositoryImpl.class);
 	
-	
+	@Autowired
+	public TransactionRepositoryImpl(NamedParameterJdbcTemplate jdbcTemplate, AccountCacheImpl accountCache) {
+		this.jdbcTemplate = jdbcTemplate;
+		this.accountCache = accountCache;
+	}
+
 	@Override
 	public int save(Transaction transaction) {
 		
@@ -51,15 +60,14 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 			return 0;
 		}
 		
+		// Update the cache with the new transaction details
+		accountCache.saveTransaction(transaction);
+		logger.debug("Saving the transaction [{}] for the account [{}] to the cache", transaction.getTransactionRef(), transaction.getAccountId());
+		
 		return result;
 		
 	}
-
-	@Override
-	public Transaction getTransactionDetails(Long transactionRef) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 	@Override
 	public List<Transaction> getAllTransactions() {
@@ -85,6 +93,12 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 		
 		MapSqlParameterSource parameters = new MapSqlParameterSource();
 		List<Transaction> transactions = new ArrayList<>();
+		
+		// Check the cache if the given account transactions are available
+		if (accountCache.transactionExists(accountId)) {
+			logger.debug("Found the transactions for account [{}] in the cache", accountId);
+			return accountCache.getAccountTransactions(accountId);
+		}
 		
 		parameters.addValue("accountId", accountId);
 		

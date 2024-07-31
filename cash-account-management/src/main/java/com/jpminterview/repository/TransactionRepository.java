@@ -10,7 +10,6 @@ import com.jpminterview.entity.TransactionType;
 public interface TransactionRepository {
 
 	public int save(Transaction transaction);
-	public Transaction getTransactionDetails(Long transactionRef);
 	public List<Transaction> getAllTransactions();
 	public List<Transaction> getTransactionsForAnAccount(String accountId);
 }
