@@ -21,10 +21,10 @@ public class AccountRepositoryImpl implements AccountRepository {
 
 
 	@Override
-	public Account getAccount(AccountInput accountInput) {
+	public Account getAccount(String accountId) {
 		
 		Account account = new Account();
-		account.setAccountId(accountInput.getAccountId());
+		account.setAccountId(accountId);
 		Account resultAccount;
 		
 		try {

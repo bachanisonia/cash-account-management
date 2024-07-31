@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jpminterview.dto.AccountInput;
+import com.jpminterview.dto.AccountResponse;
 import com.jpminterview.dto.TransactionInput;
+import com.jpminterview.dto.TransactionResponse;
 import com.jpminterview.entity.Account;
 import com.jpminterview.entity.Transaction;
 import com.jpminterview.entity.TransactionType;
@@ -32,11 +34,18 @@ public class CashAccountService implements AccountService {
 		this.transactionRepository = transactionRepository;
 	}
 
-	public Account getAccount(AccountInput accountInput) {
+	public AccountResponse getAccount(String accountId) {
 		
-		Account account = accountRepository.getAccount(accountInput);
+		Account account = accountRepository.getAccount(accountId);
+		AccountResponse accountResponse = new AccountResponse();
 		
-		return account;
+		if (account == null) {
+			accountResponse.setMessage(Message.NO_ACCOUNT_FOUND);
+		}
+		
+		accountResponse.setMessage(Message.OK);
+		accountResponse.setAccount(account);
+		return accountResponse;
 	}
 
 	
@@ -89,22 +98,26 @@ public class CashAccountService implements AccountService {
 	 */
 	@Override
 	@Transactional
-	public ResponseEntity<?> debit(TransactionInput transactionInput) {
+	public TransactionResponse debit(TransactionInput transactionInput) {
 	
 		BigDecimal transactionAmount = transactionInput.getTransactionAmount();
+		TransactionResponse transactionResponse = new TransactionResponse();
 		
 		
 		/* ******  Get Account details ******* */
-		Account drAccount = getAccount(new AccountInput(transactionInput.getAccountId()));
+		AccountResponse accountResponse = getAccount(transactionInput.getAccountId());
+		Account drAccount = accountResponse.getAccount();
 		
 		if (drAccount == null) {
-			return new ResponseEntity<>(Message.NO_ACCOUNT_FOUND, HttpStatus.OK);
+			transactionResponse.setMessage(Message.NO_ACCOUNT_FOUND);
+			return transactionResponse;
 		}
 		
 		
 		/* ******  Check Account Funds ******* */
 		if ( !hasSufficientFunds(drAccount, transactionAmount) ) {
-			return new ResponseEntity<>(Message.INSUFFICIENT_FUNDS, HttpStatus.BAD_REQUEST);
+			transactionResponse.setMessage(Message.INSUFFICIENT_FUNDS);
+			return transactionResponse;
 		}
 		
 		
@@ -122,25 +135,29 @@ public class CashAccountService implements AccountService {
 		/* ******  Save the transaction details ******* */
 		transactionRepository.save(drTransaction);
 		
-		return new ResponseEntity<>(drTransaction, HttpStatus.OK);
+		transactionResponse.setMessage(Message.OK);
+		transactionResponse.setTransaction(drTransaction);
+		
+		return transactionResponse;
 		
 	}
 
 
 	@Override
 	@Transactional
-	public ResponseEntity<?> credit(TransactionInput transactionInput) {
+	public TransactionResponse credit(TransactionInput transactionInput) {
 		
 		BigDecimal transactionAmount = transactionInput.getTransactionAmount();
-		
+		TransactionResponse transactionResponse = new TransactionResponse();
 		
 		/* ******  Get Account details ******* */
-		Account crAccount = getAccount(new AccountInput(transactionInput.getAccountId()));
+		AccountResponse accountResponse = getAccount(transactionInput.getAccountId());
+		Account crAccount = accountResponse.getAccount();
 		
 		if (crAccount == null) {
-			return new ResponseEntity<>(Message.NO_ACCOUNT_FOUND, HttpStatus.OK);
+			transactionResponse.setMessage(Message.NO_ACCOUNT_FOUND);
+			return transactionResponse;
 		}
-		
 		
 		/* ******  Update the account with the new balance ******* */
 		crAccount.setAccountBalance(crAccount.getAccountBalance().add(transactionAmount));
@@ -155,7 +172,10 @@ public class CashAccountService implements AccountService {
 		/* ******  Save the transaction details ******* */
 		transactionRepository.save(crTransaction);
 		
-		return new ResponseEntity<>(crTransaction, HttpStatus.OK);
+		transactionResponse.setMessage(Message.OK);
+		transactionResponse.setTransaction(crTransaction);
+		
+		return transactionResponse;
 	
 	}
 

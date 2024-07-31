@@ -21,8 +21,9 @@ public class Transaction {
 	public Transaction() {
 	}
 
-	public Transaction(TransactionType transactionType, BigDecimal transactionAmount, String transactionCurrency,
+	public Transaction(Long transactionRef, TransactionType transactionType, BigDecimal transactionAmount, String transactionCurrency,
 			String accountId) {
+		this.transactionRef = transactionRef;
 		this.transactionType = TransactionType.CREDIT.getTransactionType();
 		this.transactionAmount = transactionAmount;
 		this.transactionCurrency = transactionCurrency;

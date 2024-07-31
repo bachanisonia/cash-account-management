@@ -1,10 +1,21 @@
 package com.jpminterview.util;
 
-public class Message {
+public enum Message {
 	
-	public static final String NO_ACCOUNT_FOUND = "Could not find the account no, Please check again.";
-	public static final String TRANSACTION_UNSUCCESSFUL = "Transaction unsuccessfull !!!";
-	public static final String INSUFFICIENT_FUNDS = "Insufficient Funds !!!";
-	public static final String NO_TRANSACTIONS_FOUND = "No Transactions found !!!";
+	OK("OK"),
+	NO_ACCOUNT_FOUND("Could not find the account no, Please check again."),
+	TRANSACTION_UNSUCCESSFUL("Transaction unsuccessfull !!!"),
+	INSUFFICIENT_FUNDS("Insufficient Funds !!!"),
+	NO_TRANSACTIONS_FOUND("No Transactions found !!!");
+	
+	private String messageDesc;
 
+	private Message(String messageDesc) {
+		this.messageDesc = messageDesc;
+	}
+
+	public String getMessageDesc() {
+		return messageDesc;
+	}
+	
 }

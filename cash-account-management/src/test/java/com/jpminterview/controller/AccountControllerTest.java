@@ -22,8 +22,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.LinkedMultiValueMap;
 
 import com.jpminterview.dto.AccountInput;
+import com.jpminterview.dto.AccountResponse;
+import com.jpminterview.dto.TransactionInput;
+import com.jpminterview.dto.TransactionResponse;
 import com.jpminterview.entity.Account;
 import com.jpminterview.service.CashAccountService;
+import com.jpminterview.util.JsonUtil;
+import com.jpminterview.util.Message;
 
 import net.bytebuddy.NamingStrategy.Suffixing.BaseNameResolver.ForGivenType;
 
@@ -45,9 +50,11 @@ class AccountControllerTest {
 		@Test
 		@DisplayName("Invalid Account Number")
 		void testInvalidAccountNumber() throws Exception {
+			String accountId = "ACCOUNT5670";
+			when(accountService.getAccount(accountId)).thenReturn(new AccountResponse(Message.NO_ACCOUNT_FOUND));
 			
 			mvc.perform(MockMvcRequestBuilders.post("/cash-management/accounts")
-					.content("{\"accountId\": \"ACCOUNT52850\"}")
+					.content(JsonUtil.toJson(accountId))
 					.contentType(MediaType.APPLICATION_JSON))
 					.andExpect(MockMvcResultMatchers.status().isBadRequest());
 		}	
@@ -56,30 +63,37 @@ class AccountControllerTest {
 		@DisplayName("valid Account Number")
 		void testValidAccountNumber() throws Exception {
 			
+			String accountId = "ACCOUNT5285";
 			Account account = new Account("ACCOUNT5285", "GBP", new BigDecimal(500.0), new BigDecimal(500.0), new BigDecimal(500.0));
-			when(accountService.getAccount(new AccountInput(any(String.class)))).thenReturn(account);
+			when(accountService.getAccount(accountId)).thenReturn(new AccountResponse(account, Message.OK));
 			
 			mvc.perform(MockMvcRequestBuilders.post("/cash-management/accounts")
-					.content("{\"accountId\": \"ACCOUNT5285\"}")
+					.content(JsonUtil.toJson(accountId))
 					.contentType(MediaType.APPLICATION_JSON))
 					.andExpect(MockMvcResultMatchers.status().isOk());
 		}
 		
 	}
 	
-	/*
+	
 	@Nested
-	@DisplayName("accountCredit")
-	class CreditTest {
+	@DisplayName("accountDebit")
+	class DebitTest {
 		
 		@Test
 		@DisplayName("Invalid Account Number")
 		void testInvalidAccountNumber() throws Exception {
+			
+			TransactionInput transactionInput = new TransactionInput("ACCOUNT52850", new BigDecimal(100.0), "GBP");
+			//when(accountService.getAccount("ACCOUNT52850")).thenReturn(new AccountResponse(Message.NO_ACCOUNT_FOUND));
+			when(accountService.debit(transactionInput)).thenReturn(new TransactionResponse(Message.NO_ACCOUNT_FOUND));
+			
 			mvc.perform(MockMvcRequestBuilders.post("/cash-management/debit")
-					.content("{\"accountId\": \"ACCOUNT52850\", \"transactionAmount\": \"100.0\", \"transactionCurrency\": \"GBP\"}")
+					//.content("{\"accountId\": \"ACCOUNT52850\", \"transactionAmount\": 100.0, \"transactionCurrency\": \"GBP\"}")
+					.content(JsonUtil.toJson(transactionInput))
 					.contentType(MediaType.APPLICATION_JSON))
 					.andExpect(MockMvcResultMatchers.status().isBadRequest());
 		}
-	}*/
+	}
 
 }

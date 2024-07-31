@@ -15,9 +15,11 @@ import org.mockito.exceptions.base.MockitoException;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.jpminterview.dto.AccountInput;
+import com.jpminterview.dto.AccountResponse;
 import com.jpminterview.entity.Account;
 import com.jpminterview.repository.AccountRepositoryImpl;
 import com.jpminterview.repository.TransactionRepositoryImpl;
+import com.jpminterview.util.Message;
 
 @ExtendWith(MockitoExtension.class)
 class CashAccountServiceTest {
@@ -39,15 +41,16 @@ class CashAccountServiceTest {
 	@DisplayName("getAccount - Valid Account")
 	void testIfCorrectAccountDetailsAreReturned() {
 		
-		Account account = new Account("ACCOUNT5285", "GBP", new BigDecimal(500.0), new BigDecimal(500.0), new BigDecimal(500.0));
+		String accountId = "ACCOUNT5285";
+		Account account = new Account(accountId, "GBP", new BigDecimal(500.0), new BigDecimal(500.0), new BigDecimal(500.0));
 		
-		when(accountRepository.getAccount(new AccountInput("ACCOUNT5285"))).thenReturn(account);
+		when(accountRepository.getAccount(accountId)).thenReturn(account);
 		
-		Account resultAccount = mockAccountService.getAccount(new AccountInput("ACCOUNT5285"));
+		AccountResponse resultAccount = mockAccountService.getAccount(accountId);
 		
-		assertEquals(resultAccount.getAccountId(), account.getAccountId());
-		assertEquals(resultAccount.getAccountCurrency(), account.getAccountCurrency());
-		assertEquals(resultAccount.getAccountBalance(), account.getAccountBalance());
+		assertEquals(resultAccount.getAccount().getAccountId(), account.getAccountId());
+		assertEquals(resultAccount.getAccount().getAccountCurrency(), account.getAccountCurrency());
+		assertEquals(resultAccount.getAccount().getAccountBalance(), account.getAccountBalance());
 		
 	}
 	
@@ -55,11 +58,12 @@ class CashAccountServiceTest {
 	@DisplayName("getAccount - Null Account")
 	void testifNullIsReturnedForAccountNotFound() {
 		
-		when(accountRepository.getAccount(new AccountInput("ACCOUNT5285"))).thenReturn(null);
+		String accountId = "ACCOUNT52850";
+		when(accountRepository.getAccount(accountId)).thenReturn(null);
 		
-		Account resultAccount = mockAccountService.getAccount(new AccountInput("ACCOUNT5285"));
+		AccountResponse resultAccount = mockAccountService.getAccount(accountId);
 		
-		assertThat(resultAccount).isNull();
+		assertThat(resultAccount.getAccount()).isNull();
 		
 	}
 	

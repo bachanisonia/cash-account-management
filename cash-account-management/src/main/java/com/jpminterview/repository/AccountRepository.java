@@ -8,6 +8,6 @@ import com.jpminterview.entity.Account;
 
 public interface AccountRepository {
 
-	public Account getAccount(AccountInput accountId);
+	public Account getAccount(String accountId);
 	public int updateAccount(Account account);
 }

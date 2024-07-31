@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jpminterview.dto.AccountInput;
+import com.jpminterview.dto.AccountResponse;
 import com.jpminterview.dto.TransactionInput;
+import com.jpminterview.dto.TransactionResponse;
 import com.jpminterview.entity.Account;
 import com.jpminterview.entity.Transaction;
 import com.jpminterview.service.CashAccountService;
@@ -32,24 +34,40 @@ public class AccountController {
 	@PostMapping("/accounts")
 	public ResponseEntity<?> getAccountInfo(@RequestBody AccountInput accountInput) {
 		
-		Account account = accountService.getAccount(accountInput);
+		AccountResponse accountResponse = accountService.getAccount(accountInput.getAccountId());
 		
-		if (account == null) {
-			return new ResponseEntity<>(Message.NO_ACCOUNT_FOUND, HttpStatus.BAD_REQUEST);
+		if (!accountResponse.getMessage().equals(Message.OK)) {
+			return new ResponseEntity<>(accountResponse.getMessage().getMessageDesc(), HttpStatus.BAD_REQUEST);
 		}
 		else {
-			return new ResponseEntity<>(account, HttpStatus.OK);
+			return new ResponseEntity<>(accountResponse.getAccount(), HttpStatus.OK);
 		}
 	}
 	
 	@PostMapping("/debit")
-	public ResponseEntity<?> accountDebit(@RequestBody TransactionInput accountTransactionInput) {
-		return accountService.debit(accountTransactionInput);
+	public ResponseEntity<?> accountDebit(@RequestBody TransactionInput transactionInput) {
+		
+		TransactionResponse transactionResponse = accountService.debit(transactionInput);
+		
+		if (!transactionResponse.getMessage().equals(Message.OK)) {
+			return new ResponseEntity<>(transactionResponse.getMessage().getMessageDesc(), HttpStatus.BAD_REQUEST);
+		}
+		else {
+			return new ResponseEntity<>(transactionResponse.getTransaction(), HttpStatus.OK);
+		}
 	}
 	
 	@PostMapping("/credit")
-	public ResponseEntity<?> accountCredit(@RequestBody TransactionInput accountTransactionInput) {
-		return accountService.credit(accountTransactionInput);
+	public ResponseEntity<?> accountCredit(@RequestBody TransactionInput transactionInput) {
+		
+		TransactionResponse transactionResponse = accountService.credit(transactionInput);
+		
+		if (!transactionResponse.getMessage().equals(Message.OK)) {
+			return new ResponseEntity<>(transactionResponse.getMessage().getMessageDesc(), HttpStatus.BAD_REQUEST);
+		}
+		else {
+			return new ResponseEntity<>(transactionResponse.getTransaction(), HttpStatus.OK);
+		}
 	}
 	
 	

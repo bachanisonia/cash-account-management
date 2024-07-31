@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "cash.account.threshold",
+    "type": "java.lang.String",
+    "description": "A description for 'cash.account.threshold'"
+  },
+  {
+    "name": "cash.account.currency",
+    "type": "java.lang.String",
+    "description": "A description for 'cash.account.currency'"
+  },
+  {
+    "name": "cash.account.credit.limit",
+    "type": "java.lang.String",
+    "description": "A description for 'cash.account.credit.limit'"
+  }
+]}

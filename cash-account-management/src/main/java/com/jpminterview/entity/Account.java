@@ -3,6 +3,9 @@ package com.jpminterview.entity;
 import java.math.BigDecimal;
 import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -10,16 +13,14 @@ public class Account {
 
 	private String accountId;
 	private AccountType accountType;
-	private String accountCurrency;
 	private BigDecimal accountBalance;
-	private final BigDecimal accountThreshold;
+	private String accountCurrency;
 	private BigDecimal accountCreditLimit;
+	private BigDecimal accountThreshold;
 	
 	public Account() {
 		this.accountType = AccountType.CASH_ACCOUNT;
 		this.accountThreshold = new BigDecimal(500);
-		//this.accountCreditLimit = new BigDecimal(1000);
-		this.accountCurrency = "GBP";
 	}
 
 	public Account(String accountId, String accountCurrency, BigDecimal accountBalance, BigDecimal accountThreshold,
@@ -27,12 +28,13 @@ public class Account {
 		
 		this.accountType = AccountType.CASH_ACCOUNT;
 		this.accountThreshold = new BigDecimal(500);
-		//this.accountCreditLimit = new BigDecimal(1000);
-		this.accountCurrency = "GBP";
-		
 		this.accountId = accountId;
 		this.accountBalance = accountBalance;
 
+	}
+
+	public void setAccountThreshold(BigDecimal accountThreshold) {
+		this.accountThreshold = accountThreshold;
 	}
 
 	public void setAccountId(String accountId) {
