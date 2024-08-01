@@ -1,10 +1,7 @@
 package com.jpminterview.repository;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,14 +10,11 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import com.jpminterview.dto.TransactionInput;
 import com.jpminterview.entity.Transaction;
-import com.jpminterview.entity.TransactionType;
 import com.jpminterview.util.AccountCacheImpl;
 
 @Repository
@@ -30,7 +24,6 @@ public class TransactionRepositoryImpl implements TransactionRepository {
 	private AccountCacheImpl accountCache;
 	private static final Logger logger = LoggerFactory.getLogger(TransactionRepositoryImpl.class);
 	
-	@Autowired
 	public TransactionRepositoryImpl(NamedParameterJdbcTemplate jdbcTemplate, AccountCacheImpl accountCache) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.accountCache = accountCache;

@@ -8,21 +8,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.jpminterview.entity.Account;
 import com.jpminterview.entity.Transaction;
-import com.jpminterview.repository.AccountRepositoryImpl;
 import com.jpminterview.repository.TransactionRepositoryImpl;
 
 @Service
 public class CashTransactionService implements TransactionService {
-
-	private AccountRepositoryImpl accountRepository;
+	
 	private TransactionRepositoryImpl transactionRepository;
 	private static final Logger logger = LoggerFactory.getLogger(CashAccountService.class);
-	
-	@Autowired
-	public CashTransactionService(AccountRepositoryImpl accountRepository, TransactionRepositoryImpl transactionRepository) {
-		this.accountRepository = accountRepository;
+
+	public CashTransactionService(TransactionRepositoryImpl transactionRepository) {
 		this.transactionRepository = transactionRepository;
 	}
 

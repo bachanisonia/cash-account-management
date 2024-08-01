@@ -5,12 +5,9 @@ import java.math.BigDecimal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.jpminterview.dto.AccountInput;
 import com.jpminterview.dto.AccountResponse;
 import com.jpminterview.dto.TransactionInput;
 import com.jpminterview.dto.TransactionResponse;
@@ -25,14 +22,16 @@ import com.jpminterview.util.Message;
 public class CashAccountService implements AccountService {
 
 	private AccountRepositoryImpl accountRepository;
-	private TransactionRepositoryImpl transactionRepository;
-	private static final Logger logger = LoggerFactory.getLogger(CashAccountService.class);
-	
-	@Autowired
+
 	public CashAccountService(AccountRepositoryImpl accountRepository, TransactionRepositoryImpl transactionRepository) {
 		this.accountRepository = accountRepository;
 		this.transactionRepository = transactionRepository;
 	}
+
+
+	@Autowired
+	private TransactionRepositoryImpl transactionRepository;
+	private static final Logger logger = LoggerFactory.getLogger(CashAccountService.class);
 
 	public AccountResponse getAccountDetails(String accountId) {
 		

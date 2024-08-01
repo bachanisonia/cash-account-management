@@ -21,9 +21,6 @@ import com.jpminterview.repository.TransactionRepositoryImpl;
 
 @ExtendWith(MockitoExtension.class)
 class CashTransactionServiceTest {
-
-	@Mock
-	private AccountRepositoryImpl accountRepository;
 	
 	@Mock
 	private TransactionRepositoryImpl transactionRepository;
@@ -32,7 +29,7 @@ class CashTransactionServiceTest {
 	
 	@BeforeEach
 	void setup() {
-		mockTransactionService = new CashTransactionService(accountRepository, transactionRepository);
+		mockTransactionService = new CashTransactionService(transactionRepository);
 	}
 	
 	@Test

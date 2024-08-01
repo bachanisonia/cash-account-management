@@ -12,7 +12,6 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.jpminterview.dto.AccountInput;
 import com.jpminterview.entity.Account;
 import com.jpminterview.util.AccountCacheImpl;
 
@@ -22,8 +21,7 @@ public class AccountRepositoryImpl implements AccountRepository {
 	private NamedParameterJdbcTemplate jdbcTemplate;
 	private AccountCacheImpl accountCache;
 	private static final Logger logger = LoggerFactory.getLogger(AccountRepositoryImpl.class);
-
-	@Autowired
+	
 	public AccountRepositoryImpl(NamedParameterJdbcTemplate jdbcTemplate, AccountCacheImpl accountCache) {
 		this.jdbcTemplate = jdbcTemplate;
 		this.accountCache = accountCache;
