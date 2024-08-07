@@ -22,16 +22,13 @@ import com.jpminterview.util.Message;
 public class CashAccountService implements AccountService {
 
 	private AccountRepositoryImpl accountRepository;
+	private TransactionRepositoryImpl transactionRepository;
+	private static final Logger logger = LoggerFactory.getLogger(CashAccountService.class);
 
 	public CashAccountService(AccountRepositoryImpl accountRepository, TransactionRepositoryImpl transactionRepository) {
 		this.accountRepository = accountRepository;
 		this.transactionRepository = transactionRepository;
 	}
-
-
-	@Autowired
-	private TransactionRepositoryImpl transactionRepository;
-	private static final Logger logger = LoggerFactory.getLogger(CashAccountService.class);
 
 	public AccountResponse getAccountDetails(String accountId) {
 		
